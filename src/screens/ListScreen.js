@@ -28,6 +28,7 @@ export default class ListScreen extends Component {
   componentDidMount = () => {
     this.loadData();
     setTimeout(() => {
+      this.setState({page: 0});
       this.loadData();
     }, 10000);
   };
@@ -66,6 +67,7 @@ export default class ListScreen extends Component {
     this.setState(
       {
         seed: this.state.seed + 1,
+        page: 0,
         isRefreshing: true,
       },
       () => {
