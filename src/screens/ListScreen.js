@@ -36,8 +36,10 @@ export default class ListScreen extends Component {
     getService('tags=story&page=' + page, '')
       .then((data) => {
         let array = this.state.newsData;
-        array.push(...data.data.hits);
-        this.setState({newsData: array});
+        if (page !== 1) {
+          array.push(...data.data.hits);
+        }
+        this.setState({newsData: array, isRefreshing: false});
         console.log(data);
       })
       .catch((err) => {
