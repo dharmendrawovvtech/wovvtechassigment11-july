@@ -7,6 +7,7 @@ import {
   Text,
   FlatList,
   StatusBar,
+  TouchableOpacity,
 } from 'react-native';
 
 import {Container, Content} from 'native-base';
@@ -18,13 +19,25 @@ export default class ListScreen extends Component {
     this.state = {
       loading: false,
       page: 0,
+      seed: 0,
+      isRefreshing: false,
       newsData: [],
     };
   }
 
   componentDidMount = () => {
-    getService('tags=story&page=0', '')
+    this.loadData();
+    setTimeout(() => {
+      this.loadData();
+    }, 10000);
+  };
+
+  loadData = (page = 1) => {
+    getService('tags=story&page=' + page, '')
       .then((data) => {
+        let array = this.state.newsData;
+        array.push(...data.data.hits);
+        this.setState({newsData: array});
         console.log(data);
       })
       .catch((err) => {
@@ -32,13 +45,60 @@ export default class ListScreen extends Component {
       });
   };
 
-  _renderList = (data) => {};
+  renderList = (data) => {
+    return (
+      <TouchableOpacity
+        onPress={() => {
+          this.props.navigation.navigate('Detail', {data: data});
+        }}>
+        <View style={style.outer}>
+          <Text>{data.created_at}</Text>
+          <Text>{data.title}</Text>
+          <Text>{data.author}</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
+
+  handleRefresh = () => {
+    this.setState(
+      {
+        seed: this.state.seed + 1,
+        isRefreshing: true,
+      },
+      () => {
+        this.loadData();
+      },
+    );
+  };
+
+  handleLoadMore = () => {
+    this.setState(
+      {
+        page: this.state.page + 1,
+      },
+      () => {
+        this.loadData(this.state.page);
+      },
+    );
+  };
 
   render() {
     console.log('enter here list');
+    const {newsData, isRefreshing} = this.state;
     return (
       <Container style={style.container}>
-        <View style={style.content}></View>
+        <View style={style.content}>
+          <FlatList
+            data={newsData}
+            renderItem={({item}) => this.renderList(item)}
+            keyExtractor={(i) => i.objectID}
+            refreshing={isRefreshing}
+            onRefresh={this.handleRefresh}
+            onEndReached={this.handleLoadMore}
+            onEndThreshold={0}
+          />
+        </View>
       </Container>
     );
   }
@@ -52,6 +112,15 @@ const style = StyleSheet.create({
     flex: 1,
     height: '100%',
     width: '100%',
-    backgroundColor: 'blue',
+    backgroundColor: 'brown',
+  },
+  outer: {
+    flex: 1,
+    backgroundColor: 'white',
+    paddingHorizontal: 5,
+    paddingVertical: 5,
+    flexDirection: 'column',
+    marginHorizontal: 30,
+    marginVertical: 5,
   },
 });
