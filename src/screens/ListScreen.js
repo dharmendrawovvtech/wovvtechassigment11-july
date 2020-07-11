@@ -39,6 +39,8 @@ export default class ListScreen extends Component {
         let array = this.state.newsData;
         if (page !== 1) {
           array.push(...data.data.hits);
+        } else {
+         array.push(data.data.hits);
         }
         this.setState({newsData: array, isRefreshing: false});
         console.log(data);
