@@ -9,8 +9,8 @@ export default function Navigation() {
   console.log('enter here navigation');
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="HCNews">
-        <Stack.Screen name="HCNews" component={ListComponent} />
+      <Stack.Navigator initialRouteName="List">
+        <Stack.Screen name="List" component={ListComponent} />
         <Stack.Screen name="Detail" component={DetailComponent} />
       </Stack.Navigator>
     </NavigationContainer>
